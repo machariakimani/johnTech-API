@@ -17,16 +17,18 @@ const getAllUsers = asyncHandler( async (req, res) => {
 const addUser = asyncHandler( async (req, res) => {
 	const {username, password, roles} = req.body
 
-	if(!username || !password || !Array.isArray(roles) || !roles.length) {
+	if(!username || !password ) {
 		return res.status(400).json({message: "All fields must be filled"})
 	}
 
-	const duplicate = await User.findOne({username}).lean().exec()
+	const duplicate = await User.findOne({username}).collation({ locale: 'en', strength: 2 }).lean().exec()
 	if (duplicate) {
 		return res.status(409).json({message: `User with username ${username} allready registerd, Duplication NOT allowed! `})
 	}
 	const hashedpwd = await bcrypt.hash(password, 10) //10 salt round
-	const userObject = {username, "password":hashedpwd, roles}
+	const userObject = (!Array.isArray(roles) || !roles.length)
+        ? { username, "password": hashedpwd }
+        : { username, "password": hashedpwd, roles }
 	const user = await User.create(userObject)
 	
 	
@@ -50,7 +52,7 @@ const updateUser = asyncHandler( async (req, res) => {
 	if (!user) {
 		return res.status(400).json({message: "user not found"})
 	}
-	const duplicate = await User.findOne({username}).lean().exec()
+	const duplicate = await User.findOne({username}).collation({ locale: 'en', strength: 2 }).lean().exec()
 	if (duplicate && duplicate?._id.toString() !== id) {
 		return res.status(409).json({message: "Duplictae username"})
 	}
