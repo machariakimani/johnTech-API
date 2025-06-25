@@ -1,0 +1,1 @@
+2025/05/24 	 10:56:55        e57a09de-5ba4-42c9-8339-bd6c74147d3a        undefined: ECONNREFUSED 	 querySrv 	 _mongodb._tcp.cluster0.b07vjgp.mongodb.net 
